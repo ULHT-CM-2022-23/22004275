@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:miniprojeto/app_container.dart';
+import 'package:miniprojeto/components/no_content.dart';
+import 'package:miniprojeto/interfaces/avaliacao.dart';
 import 'package:miniprojeto/services/avaliacao_service.dart';
 import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
@@ -16,6 +18,39 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   double _media7dias = 0;
   double _media7a14dias = 0;
+
+  List<Avaliacao> _getAvaliacoesProximos7Dias() {
+    final avaliacoes = Provider.of<AvaliacaoProvider>(context, listen: false).avaliacoes;
+    final proximos7Dias = <Avaliacao>[];
+    final hoje = DateTime.now();
+    for (final avaliacao in avaliacoes) {
+      //dataHora is a string in the format 'yyyy/MM/dd HH:mm'
+      final dataHora = avaliacao.dataHora.split(' ');
+      final data = dataHora[0].split('/');
+      final hora = dataHora[1].split(':');
+      final dataAvaliacao = DateTime(int.parse(data[0]), int.parse(data[1]), int.parse(data[2]), int.parse(hora[0]), int.parse(hora[1]));
+      if (dataAvaliacao.difference(hoje).inDays <= 7 && dataAvaliacao.difference(hoje).inDays >= 0) {
+        proximos7Dias.add(avaliacao);
+      }
+    }
+    return proximos7Dias;
+  }
+
+  String _getDaysUntil(String date) {
+    final dataHora = date.split(' ');
+    final data = dataHora[0].split('/');
+    final hora = dataHora[1].split(':');
+    final dataAvaliacao = DateTime(int.parse(data[0]), int.parse(data[1]), int.parse(data[2]), int.parse(hora[0]), int.parse(hora[1]));
+    final hoje = DateTime.now();
+    final dias = dataAvaliacao.difference(hoje).inDays;
+    if (dias == 0) {
+      return 'Hoje';
+    } else if (dias == 1) {
+      return 'Amanhã';
+    } else {
+      return 'Daqui a $dias dias';
+    }
+  }
 
   List<Color> _getColors(int media) {
     final colors = <Color>[];
@@ -40,6 +75,9 @@ class _HomeState extends State<Home> {
         colors.add(Colors.red);
         colors.add(Colors.orange);
         break;
+      default:
+        colors.add(Colors.grey);
+        colors.add(Colors.grey);
     }
     return colors;
   }
@@ -55,63 +93,92 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          Row(
-            children: [
-              SleekCircularSlider(
-                appearance: CircularSliderAppearance(
-                    customWidths: CustomSliderWidths(progressBarWidth: 10),
-                  customColors: CustomSliderColors(
-                    progressBarColors: _getColors(_media7dias.toInt()),
-                    trackColor: Colors.grey[300]!,
-                  ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const Text(
+              'Média da dificuldade',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: [
+                    SleekCircularSlider(
+                      appearance: CircularSliderAppearance(
+                        customWidths: CustomSliderWidths(progressBarWidth: 10),
+                        customColors: CustomSliderColors(
+                          progressBarColors: _getColors(_media7dias.toInt()),
+                          trackColor: Colors.grey[300]!,
+                        ),
+                      ),
+                      innerWidget: (value) {
+                        return Center(
+                          child: Text(
+                            value.toStringAsFixed(0),
+                            style: const TextStyle(fontSize: 30),
+                          ),
+                        );
+                      },
+                      min: 0,
+                      max: 5,
+                      initialValue: _media7dias,
+                    ),
+                    const Text('Nos próximos 7 dias'),
+                  ],
                 ),
-                innerWidget: (value) {
-                  return Center(
-                    child: Text(
-                      value.toStringAsFixed(0),
-                      style: const TextStyle(fontSize: 30),
+                Column(
+                  children: [
+                    SleekCircularSlider(
+                      appearance: CircularSliderAppearance(
+                        customWidths: CustomSliderWidths(progressBarWidth: 10),
+                        customColors: CustomSliderColors(
+                          progressBarColors: _getColors(_media7a14dias.toInt()),
+                          trackColor: Colors.grey[300]!,
+                        ),
+                      ),
+                      innerWidget: (value) {
+                        return Center(
+                          child: Text(
+                            value.toStringAsFixed(0),
+                            style: const TextStyle(fontSize: 30),
+                          ),
+                        );
+                      },
+                      min: 0,
+                      max: 5,
+                      initialValue: _media7a14dias,
+                    ),
+                    const Text('Entre 7 a 14 dias'),
+                  ],
+                )
+              ],
+            ),
+            const SizedBox(height: 20),
+            _getAvaliacoesProximos7Dias().isEmpty ?
+            const NoContent(title: 'Semana livre', subtitle: 'Não existe nenhuma avaliação esta semana', chosenIcon: Icons.emoji_emotions_rounded) :
+            ListView(
+              shrinkWrap: true,
+              children: [
+                const SizedBox(height: 20),
+                const Text('Próximas avaliações'),
+                const SizedBox(height: 5),
+                ..._getAvaliacoesProximos7Dias().map((avaliacao) {
+                  return Card(
+                    child: ListTile(
+                      title: Text(avaliacao.disciplina),
+                      subtitle: Text(_getDaysUntil(avaliacao.dataHora)),
                     ),
                   );
-                },
-                min: 0,
-                max: 5,
-                initialValue: _media7dias,
-              ),
-              SleekCircularSlider(
-                appearance: CircularSliderAppearance(
-                    customWidths: CustomSliderWidths(progressBarWidth: 10),
-                  customColors: CustomSliderColors(
-                    progressBarColors: _getColors(_media7a14dias.toInt()),
-                    trackColor: Colors.grey[300]!,
-                  ),
-                ),
-                innerWidget: (value) {
-                  return Center(
-                    child: Text(
-                      value.toStringAsFixed(0),
-                      style: const TextStyle(fontSize: 30),
-                    ),
-                  );
-                },
-                min: 0,
-                max: 5,
-                initialValue: _media7a14dias,
-              )
-            ],
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AppContainer()),
-              );
-            },
-            child: const Text('Go to AppContainer'),
-          ),
-        ],
+                }).toList(),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

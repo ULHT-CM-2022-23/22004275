@@ -94,6 +94,6 @@ class _AvaliacoesState extends State<Avaliacoes> {
         );
       }).toList(),
     )
-        : const NoContent(title: 'Nenhuma avaliação encontrada', subtitle: 'Quando registar uma avaliação ela aparecerá aqui');
+        : const NoContent(title: 'Nenhuma avaliação encontrada', subtitle: 'Quando registar uma avaliação ela aparecerá aqui', chosenIcon: Icons.line_weight_rounded);
   }
 }

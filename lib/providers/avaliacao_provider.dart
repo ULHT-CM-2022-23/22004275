@@ -13,38 +13,50 @@ class AvaliacaoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  _returnDataHoraDynamically(int days) {
+    final date = DateTime.now().add(Duration(days: days));
+    return '${date.year}/${date.month < 10 ? '0' : ''}${date.month}/${date.day < 10 ? '0' : ''}${date.day} ${date.hour < 10 ? '0' : ''}${date.hour}:${date.minute < 10 ? '0' : ''}${date.minute}';
+  }
+
   AvaliacaoProvider() {
     _avaliacoes = [
       Avaliacao(
-        disciplina: 'Sistemas de Informação na Nuvem',
-        tipo: AvaliacaoTipo.frequencia,
-        dataHora: '2023/10/10 10:10',
-        dificuldade: 3,
-        observacoes: 'Frequência intermédia',
-        thumbnail: 'https://www.microuniverso.com.br/wp-content/uploads/2019/01/268500-sistema-em-nuvem-o-que-e-e-quais-as-vantagens-1.jpg'
+          disciplina: 'Sistemas de Informação na Nuvem',
+          tipo: AvaliacaoTipo.frequencia,
+          dataHora: _returnDataHoraDynamically(2),
+          dificuldade: 3,
+          observacoes: 'Frequência intermédia',
+          thumbnail: 'https://www.microuniverso.com.br/wp-content/uploads/2019/01/268500-sistema-em-nuvem-o-que-e-e-quais-as-vantagens-1.jpg'
       ),
       Avaliacao(
-        disciplina: 'Segurança Informática',
-        tipo: AvaliacaoTipo.miniteste,
-        dataHora: '2023/10/23 10:10',
-        dificuldade: 2,
-        thumbnail: 'https://www.itchannel.pt/img/uploads/thumb_image_1409072920.jpg'
+          disciplina: 'Segurança Informática',
+          tipo: AvaliacaoTipo.miniteste,
+          dataHora: _returnDataHoraDynamically(4),
+          dificuldade: 2,
+          thumbnail: 'https://www.itchannel.pt/img/uploads/thumb_image_1409072920.jpg'
       ),
       Avaliacao(
-        disciplina: 'Computação Móvel',
-        tipo: AvaliacaoTipo.projeto,
-        dataHora: '2023/02/11 10:10',
-        dificuldade: 4,
-        observacoes: 'Projeto de grupo',
-        thumbnail: 'https://is5-ssl.mzstatic.com/image/thumb/Purple122/v4/52/86/a0/5286a03f-ddfb-64d4-4583-a8deb1291b06/AppIcon1-0-0-85-220-0-0-0-0-4-0-0-0-2x-sRGB-0-0-0-0-0.png/256x256bb.png'
+          disciplina: 'Matemática Discreta',
+          tipo: AvaliacaoTipo.frequencia,
+          dataHora: _returnDataHoraDynamically(10),
+          dificuldade: 2,
+          thumbnail: 'https://bachilleratobootcamp.com/wp-content/uploads/2022/08/Banner_Curso_matematicas_discretas.jpg'
       ),
       Avaliacao(
-        disciplina: 'Inteligência Artificial',
-        tipo: AvaliacaoTipo.defesa,
-        dataHora: '2023/11/01 10:10',
-        dificuldade: 5,
-        observacoes: 'Defesa de projeto',
-        thumbnail: 'https://xplain.co/wp-content/uploads/2019/12/Artificial-Intelligence-2-256x256.jpg'
+          disciplina: 'Computação Móvel',
+          tipo: AvaliacaoTipo.projeto,
+          dataHora: '2023/02/11 10:10',
+          dificuldade: 4,
+          observacoes: 'Projeto de grupo',
+          thumbnail: 'https://is5-ssl.mzstatic.com/image/thumb/Purple122/v4/52/86/a0/5286a03f-ddfb-64d4-4583-a8deb1291b06/AppIcon1-0-0-85-220-0-0-0-0-4-0-0-0-2x-sRGB-0-0-0-0-0.png/256x256bb.png'
+      ),
+      Avaliacao(
+          disciplina: 'Inteligência Artificial',
+          tipo: AvaliacaoTipo.defesa,
+          dataHora: _returnDataHoraDynamically(28),
+          dificuldade: 5,
+          observacoes: 'Defesa de projeto',
+          thumbnail: 'https://xplain.co/wp-content/uploads/2019/12/Artificial-Intelligence-2-256x256.jpg'
       ),
     ];
     _orderAvaliacoes();

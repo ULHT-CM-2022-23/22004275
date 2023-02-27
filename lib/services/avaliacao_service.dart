@@ -1,6 +1,7 @@
 import '../interfaces/avaliacao.dart';
 
 class AvaliacaoService {
+
   bool canManipulate(String date) {
     //check if date in format YYY/MM/DD HH:MM is in the future
     DateTime now = DateTime.now();
@@ -24,7 +25,7 @@ class AvaliacaoService {
       String hour = avaliacao.dataHora.substring(11, 13);
       String minute = avaliacao.dataHora.substring(14, 16);
       DateTime dateToCompare = DateTime(int.parse(year), int.parse(month), int.parse(day), int.parse(hour), int.parse(minute));
-      if (now.difference(dateToCompare).inDays <= 7) {
+      if (dateToCompare.difference(now).inDays <= 7 && dateToCompare.difference(now).inDays >= 0) {
         media += avaliacao.dificuldade;
         count++;
       }
@@ -44,7 +45,7 @@ class AvaliacaoService {
       String hour = avaliacao.dataHora.substring(11, 13);
       String minute = avaliacao.dataHora.substring(14, 16);
       DateTime dateToCompare = DateTime(int.parse(year), int.parse(month), int.parse(day), int.parse(hour), int.parse(minute));
-      if (now.difference(dateToCompare).inDays > 7 && now.difference(dateToCompare).inDays <= 14) {
+      if (dateToCompare.difference(now).inDays <= 14 && dateToCompare.difference(now).inDays >= 7) {
         media += avaliacao.dificuldade;
         count++;
       }

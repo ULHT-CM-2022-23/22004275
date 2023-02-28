@@ -45,5 +45,5 @@ Este projeto foi realizado por Rodrigo Francisco Félix Barata, aluno 22004275.
 
 # Autoavaliação
 
-    16 valores.
+16 valores.
 ![Rodapé](https://www.seekpng.com/png/full/977-9771328_wave-footer-illustration.png)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:miniprojeto/app_container.dart';
 import 'package:miniprojeto/components/no_content.dart';
 import 'package:miniprojeto/interfaces/avaliacao.dart';
+import 'package:miniprojeto/pages/detalhes.dart';
 import 'package:miniprojeto/services/avaliacao_service.dart';
 import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
@@ -92,6 +93,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final avaliacoes = Provider.of<AvaliacaoProvider>(context).avaliacoes;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -169,6 +171,7 @@ class _HomeState extends State<Home> {
                 ..._getAvaliacoesProximos7Dias().map((avaliacao) {
                   return Card(
                     child: ListTile(
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => Detalhes(index: avaliacoes.indexOf(avaliacao)))),
                       title: Text(avaliacao.disciplina),
                       subtitle: Text(_getDaysUntil(avaliacao.dataHora)),
                     ),

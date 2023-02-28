@@ -39,7 +39,7 @@ class AvaliacaoProvider extends ChangeNotifier {
           disciplina: 'Matemática Discreta',
           tipo: AvaliacaoTipo.frequencia,
           dataHora: _returnDataHoraDynamically(10),
-          dificuldade: 2,
+          dificuldade: 5,
           thumbnail: 'https://bachilleratobootcamp.com/wp-content/uploads/2022/08/Banner_Curso_matematicas_discretas.jpg'
       ),
       Avaliacao(

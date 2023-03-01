@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:miniprojeto/app_container.dart';
 import 'package:miniprojeto/components/no_content.dart';
 import 'package:miniprojeto/interfaces/avaliacao.dart';
 import 'package:miniprojeto/pages/detalhes.dart';
@@ -45,9 +44,9 @@ class _HomeState extends State<Home> {
     final hoje = DateTime.now();
     final dias = dataAvaliacao.difference(hoje).inDays;
     if (dias == 0) {
-      return 'Hoje';
-    } else if (dias == 1) {
-      return 'Amanhã';
+      return 'Hoje às ${dataHora[1]}';
+    } else if (dias == 1 || ((hoje.weekday == 5 || hoje.weekday == 6) && dataAvaliacao.weekday == 1 && dias <= 3)) {
+      return 'Amanhã às ${dataHora[1]}';
     } else {
       return 'Daqui a $dias dias';
     }
@@ -81,6 +80,26 @@ class _HomeState extends State<Home> {
         colors.add(Colors.grey);
     }
     return colors;
+  }
+
+  String _generateSugestaoDeEstudo() {
+    final avaliacoes = Provider.of<AvaliacaoProvider>(context, listen: false).avaliacoes;
+    final media7dias = AvaliacaoService().getMedia7dias(avaliacoes);
+    final media7a14dias = AvaliacaoService().getMedia7a14dias(avaliacoes);
+
+    if (media7dias == 0) {
+      return 'Não tens avaliações nos próximos 7 dias, aproveita para estudar!';
+    } else if (media7a14dias == 0) {
+      return 'Não tens avaliações nos próximos 7 a 14 dias, aproveita para estudar!';
+    } else if (media7dias > media7a14dias) {
+      return 'Os próximos 7 dias serão mais difíceis, tenta estudar mais!';
+    } else if (media7dias < media7a14dias) {
+      return 'Aproveita que os próximos 7 dias serão mais fáceis e estuda mais!';
+    } else if (media7dias == media7a14dias){
+      return 'Parece que vais ter duas semanas de estudos iguais, aproveita para repartir o estudo!';
+    } else {
+      return 'Continua um bom trabalho!';
+    }
   }
 
   @override
@@ -172,6 +191,27 @@ class _HomeState extends State<Home> {
                   return Card(
                     child: ListTile(
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => Detalhes(index: avaliacoes.indexOf(avaliacao)))),
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.network(
+                            avaliacao.thumbnail ?? 'https://pbs.twimg.com/profile_images/1172454147758678016/pc18AhSV_400x400.jpg',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
+                            frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                              if (wasSynchronouslyLoaded) {
+                                return child;
+                              }
+                              return AnimatedOpacity(
+                                opacity: frame == null ? 0 : 1,
+                                duration: const Duration(seconds: 1),
+                                curve: Curves.easeOut,
+                                child: child,
+                              );
+                            }
+                        ),
+                      ),
                       title: Text(avaliacao.disciplina),
                       subtitle: Text(_getDaysUntil(avaliacao.dataHora)),
                     ),
@@ -179,7 +219,21 @@ class _HomeState extends State<Home> {
                 }).toList(),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
+            // text align to the left
+            Container(
+              alignment: Alignment.centerLeft,
+              child: const Text('Sugestão de estudo'),
+            ),
+            const SizedBox(height: 5),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                _generateSugestaoDeEstudo(),
+                style: const TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            )
           ],
         ),
       ),

@@ -67,11 +67,6 @@ class _CreateAvaliacaoState extends State<CreateAvaliacao> {
       _limparForm();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-          ),
-          margin: EdgeInsets.only(left: 10, right: 10, bottom: 10),
           backgroundColor: Colors.green,
           content: Text('A avaliação foi registada com sucesso.'),
         ),

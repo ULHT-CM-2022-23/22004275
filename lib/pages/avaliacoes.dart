@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:miniprojeto/pages/detalhes.dart';
 import 'package:miniprojeto/services/avaliacao_service.dart';
@@ -15,16 +17,21 @@ class Avaliacoes extends StatefulWidget {
 
 class _AvaliacoesState extends State<Avaliacoes> {
 
-  _deleteAvaliacao(int index, String date) {
-    if (AvaliacaoService().canManipulate(date)) {
-      final avaliacaoProvider = Provider.of<AvaliacaoProvider>(context, listen: false);
-      avaliacaoProvider.removeAvaliacao(index);
-    } else {
+  _deleteAvaliacao(int index, String date) async {
+    final avaliacaoProvider = Provider.of<AvaliacaoProvider>(context, listen: false);
+    final avaliacao = avaliacaoProvider.avaliacoes[index];
+    setState(() => avaliacaoProvider.removeAvaliacao(index));
+    if (!AvaliacaoService().canManipulate(date)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Só podem ser eliminados registos de avaliações futuras.'),
         ),
       );
+
+      // Add a delay of 500 milliseconds before adding the avaliacao back to the list
+      await Future.delayed(Duration(milliseconds: 500));
+
+      avaliacaoProvider.addAvaliacao(avaliacao);
     }
   }
 
@@ -33,6 +40,7 @@ class _AvaliacoesState extends State<Avaliacoes> {
     final avaliacaoProvider = Provider.of<AvaliacaoProvider>(context, listen: true);
 
     return avaliacaoProvider.avaliacoes.isNotEmpty ? ListView(
+      key: const Key('avaliacoes-list'),
       //get the list of avaliacoes from the provider and the index of the current item
       children: avaliacaoProvider.avaliacoes.map((avaliacao) {
         return Dismissible(

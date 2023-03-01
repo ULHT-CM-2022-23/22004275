@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:miniprojeto/interfaces/avaliacao.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../providers/avaliacao_provider.dart';
 import '../services/avaliacao_service.dart';
 
@@ -55,6 +56,10 @@ class _DetalhesState extends State<Detalhes> {
     });
   }
 
+  void _share(Avaliacao avaliacao) {
+    Share.share('Mensagem do Dealer!!\n\nVamos ter avaliação de ${avaliacao.disciplina}, em ${avaliacao.dataHora}, com a dificuldade de ${avaliacao.dificuldade} numa escala de 1 a 5.\n\nObservações para esta avaliação:\n${avaliacao.observacoes ?? 'Sem observações'}');
+  }
+
   @override
   Widget build(BuildContext context) {
     final AvaliacaoProvider avaliacaoProvider = Provider.of<AvaliacaoProvider>(context, listen: true);
@@ -65,18 +70,29 @@ class _DetalhesState extends State<Detalhes> {
         //icon button on the right side of the app bar
         actions: [
           IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () => _share(avaliacao),
+          ),
+          IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () => _deteleAvaliacao(),
           ),
         ],
       ) : AppBar(
         title: const Text('Detalhes da avaliação'),
+        //icon button on the right side of the app bar
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () => _share(avaliacao),
+          )
+        ],
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         child: SingleChildScrollView(
           child: _editing ?
-          DetalhesEdit(index: widget.index, avaliacao: avaliacao) :
+          DetalhesEdit(index: widget.index, avaliacao: avaliacao, onFormSubmitted: _toggleEdit) :
           DetalhesView(index: widget.index, canManipulate: AvaliacaoService().canManipulate(avaliacao.dataHora)),
         ),
       ),
@@ -92,7 +108,6 @@ class DetalhesView extends StatelessWidget {
   final int index;
   final bool canManipulate;
   const DetalhesView({Key? key, required this.index, required this.canManipulate}) : super(key: key);
-
 
   String _getDateString(String date) {
     //check if date in format YYY/MM/DD HH:MM is in the future
@@ -205,8 +220,9 @@ class DetalhesView extends StatelessWidget {
 class DetalhesEdit extends StatefulWidget {
   Avaliacao avaliacao;
   final int index;
+  final VoidCallback onFormSubmitted;
 
-  DetalhesEdit({Key? key, required this.index, required this.avaliacao}) : super(key: key);
+  DetalhesEdit({Key? key, required this.index, required this.avaliacao, required this.onFormSubmitted}) : super(key: key);
 
   @override
   State<DetalhesEdit> createState() => _DetalhesEditState();
@@ -230,11 +246,11 @@ class _DetalhesEditState extends State<DetalhesEdit> {
   @override
   void initState() {
     final avaliacaoProvider = Provider.of<AvaliacaoProvider>(context, listen: false);
-    _nomeController.text = widget.avaliacao.disciplina;
+    _nomeController.value = TextEditingValue(text: widget.avaliacao.disciplina);
     _data = widget.avaliacao.dataHora;
     _dificuldade = widget.avaliacao.dificuldade;
-    _dropdownMenuController.text = avaliacaoProvider.tipoLabel(widget.avaliacao.tipo);
-    _observacoesController.text = widget.avaliacao.observacoes ?? '';
+    _dropdownMenuController.value = TextEditingValue(text: avaliacaoProvider.tipoLabel(widget.avaliacao.tipo));
+    _observacoesController.value = TextEditingValue(text: widget.avaliacao.observacoes ?? '');
     super.initState();
   }
 
@@ -259,7 +275,14 @@ class _DetalhesEditState extends State<DetalhesEdit> {
       _loading = true;
     });
     final AvaliacaoProvider avaliacaoProvider = Provider.of<AvaliacaoProvider>(context, listen: false);
-    avaliacaoProvider.editarAvaliacao(widget.index, widget.avaliacao);
+    avaliacaoProvider.editarAvaliacao(widget.index, Avaliacao(
+      disciplina: _nomeController.text,
+      tipo: avaliacaoProvider.tipoFromLabel(_dropdownMenuController.text),
+      dataHora: _data,
+      dificuldade: _dificuldade,
+      observacoes: _observacoesController.text,
+      thumbnail: widget.avaliacao.thumbnail,
+    ));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('O registo de avaliação selecionado foi editado com sucesso.'),
@@ -267,6 +290,7 @@ class _DetalhesEditState extends State<DetalhesEdit> {
     );
     setState(() {
       _loading = false;
+      widget.onFormSubmitted();
     });
   }
 

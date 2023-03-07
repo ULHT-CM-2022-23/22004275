@@ -15,7 +15,7 @@ class CreateAvaliacao extends StatefulWidget {
 
 class _CreateAvaliacaoState extends State<CreateAvaliacao> {
   final _nomeController = TextEditingController();
-  final _dropdownMenuController = TextEditingController();
+ AvaliacaoTipo? _tipoAvaliacao;
   final _observacoesController = TextEditingController();
   final List<String> _dificuldadeLabels = [
     'Muito fácil',
@@ -37,13 +37,13 @@ class _CreateAvaliacaoState extends State<CreateAvaliacao> {
 
   bool _isFormValid() {
     return _nomeController.text.isNotEmpty &&
-        _dropdownMenuController.text.isNotEmpty &&
+        _tipoAvaliacao != null &&
         _data.isNotEmpty;
   }
 
   void _limparForm() {
     _nomeController.clear();
-    _dropdownMenuController.clear();
+    _tipoAvaliacao = null;
     _observacoesController.clear();
     setState(() {
       _dificuldade = 3;
@@ -57,7 +57,7 @@ class _CreateAvaliacaoState extends State<CreateAvaliacao> {
       final avaliacaoProvider = Provider.of<AvaliacaoProvider>(context, listen: false);
       final avaliacao = Avaliacao(
         disciplina: _nomeController.text,
-        tipo: avaliacaoProvider.tipoFromLabel(_dropdownMenuController.text),
+        tipo: _tipoAvaliacao!,
         dataHora: _data,
         dificuldade: _dificuldade,
         observacoes: _observacoesController.text,
@@ -71,7 +71,7 @@ class _CreateAvaliacaoState extends State<CreateAvaliacao> {
           content: Text('A avaliação foi registada com sucesso.'),
         ),
       );
-    } else if(_dropdownMenuController.text.isEmpty) {
+    } else if(_tipoAvaliacao == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           behavior: SnackBarBehavior.floating,
@@ -130,88 +130,86 @@ class _CreateAvaliacaoState extends State<CreateAvaliacao> {
               onSubmitted: (_) => FocusScope.of(context).nextFocus(),
             ),
             SizedBox.fromSize(size: const Size(0, 16)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DropdownMenu(
-                  width: 200,
-                  hintText: 'Tipo de avaliação',
-                  enableSearch: false,
-                  enableFilter: false,
-                  controller: _dropdownMenuController,
-                  dropdownMenuEntries: const [
-                    DropdownMenuEntry(
-                        value: 0,
-                        label: 'Frequência'
-                    ),
-                    DropdownMenuEntry(
-                        value: 1,
-                        label: 'Mini-teste'
-                    ),
-                    DropdownMenuEntry(
-                        value: 2,
-                        label: 'Projeto'
-                    ),
-                    DropdownMenuEntry(
-                        value: 3,
-                        label: 'Defesa'
-                    )
-                  ],
-                  onSelected: (_) => setState(() => FocusScope.of(context).unfocus()),
+            DropdownButton(
+              isExpanded: true,
+              value: _tipoAvaliacao,
+              hint: const Text('Tipo de avaliação'),
+              enableFeedback: true,
+              items: const [
+                DropdownMenuItem(
+                  value: AvaliacaoTipo.frequencia,
+                  child: Text('Frequência'),
                 ),
-                SizedBox(
-                  //auto width that doesnt overflow
-                  width: MediaQuery.of(context).size.width - 290,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      DateTime? dateTime = await showOmniDateTimePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(
-                          const Duration(days: 3652),
-                        ),
-                        is24HourMode: true,
-                        isShowSeconds: false,
-                        minutesInterval: 1,
-                        secondsInterval: 1,
-                        borderRadius: const BorderRadius.all(Radius.circular(16)),
-                        constraints: const BoxConstraints(
-                          maxWidth: 350,
-                          maxHeight: 650,
-                        ),
-                        transitionBuilder: (context, anim1, anim2, child) {
-                          return FadeTransition(
-                            opacity: anim1.drive(
-                              Tween(
-                                begin: 0,
-                                end: 1,
-                              ),
-                            ),
-                            child: child,
-                          );
-                        },
-                        transitionDuration: const Duration(milliseconds: 200),
-                        barrierDismissible: true,
-                        selectableDayPredicate: (dateTime) => true,
-                        type: OmniDateTimePickerType.dateAndTime,
-                      );
-
-                      _setData(dateTime!);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        _data.isEmpty ? 'Data e hora da avaliação' : _data,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                DropdownMenuItem(
+                  value: AvaliacaoTipo.miniteste,
+                  child: Text('Mini-teste'),
                 ),
+                DropdownMenuItem(
+                  value: AvaliacaoTipo.projeto,
+                  child: Text('Projeto'),
+                ),
+                DropdownMenuItem(
+                  value: AvaliacaoTipo.defesa,
+                  child: Text('Defesa'),
+                )
               ],
+              onChanged: (value) {
+                setState(() {
+                  _tipoAvaliacao = value;
+                });
+              },
+            ),
+            SizedBox.fromSize(size: const Size(0, 16)),
+            ElevatedButton(
+              onPressed: () async {
+                DateTime? dateTime = await showOmniDateTimePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(
+                    const Duration(days: 3652),
+                  ),
+                  is24HourMode: true,
+                  isShowSeconds: false,
+                  minutesInterval: 1,
+                  secondsInterval: 1,
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+                  constraints: const BoxConstraints(
+                    maxWidth: 350,
+                    maxHeight: 650,
+                  ),
+                  transitionBuilder: (context, anim1, anim2, child) {
+                    return FadeTransition(
+                      opacity: anim1.drive(
+                        Tween(
+                          begin: 0,
+                          end: 1,
+                        ),
+                      ),
+                      child: child,
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 200),
+                  barrierDismissible: true,
+                  selectableDayPredicate: (dateTime) => true,
+                  type: OmniDateTimePickerType.dateAndTime,
+                );
+
+                _setData(dateTime!);
+              },
+              style: ElevatedButton.styleFrom(
+                fixedSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  _data.isEmpty ? 'Data e hora da avaliação' : _data,
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
             SizedBox.fromSize(size: const Size(0, 20)),
             Row(

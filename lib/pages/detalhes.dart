@@ -300,6 +300,7 @@ class _DetalhesEditState extends State<DetalhesEdit> {
       child: Column(
         children: [
           TextField(
+            key: const ValueKey('nome'),
             controller: _nomeController,
             maxLength: 50,
             decoration: InputDecoration(

@@ -11,9 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:miniprojeto/app_container.dart';
 
-import 'package:miniprojeto/main.dart';
 import 'package:miniprojeto/pages/detalhes.dart';
-import 'package:miniprojeto/pages/home.dart';
 import 'package:miniprojeto/providers/avaliacao_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -177,6 +175,60 @@ void main() {
       // tap the yes button
       await tester.tap(find.text('Sim'));
       await tester.pump();
+    });
+  });
+
+  // test the edit method in the Detalhes class for index 2
+  group('Edit', () {
+    testWidgets('edit the details of the evaluation', (WidgetTester tester) async {
+      // build the widget
+      HttpOverrides.global = MyHttpOverrides();
+      await tester.pumpWidget(
+        ChangeNotifierProvider(
+          create: (context) => AvaliacaoProvider(),
+          child: MaterialApp(
+            home: Detalhes(
+              index: 2,
+            ),
+          ),
+        ),
+      );
+
+      // expect to see the title and back button
+      expect(find.text('Detalhes da avaliação'), findsOneWidget);
+
+      // expect to see the edit button
+      expect(find.byIcon(Icons.edit), findsOneWidget);
+
+      // expect that we are not editing
+      expect(find.byType(DetalhesEdit), findsNothing);
+      expect(find.byType(DetalhesView), findsOneWidget);
+
+      // tap the edit button
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pump();
+
+      // expect to see the difficulty of the evaluation
+      expect(find.text('Detalhes da avaliação'), findsOneWidget);
+      expect(find.text('Segurança Informática'), findsOneWidget);
+
+      // expect that we are editing
+      expect(find.byType(DetalhesEdit), findsOneWidget);
+      expect(find.byType(DetalhesView), findsNothing);
+
+      // add "editado" to the nomeDisciplina field
+      await tester.enterText(find.byKey(Key('nome')), 'editado');
+
+      // tap the button with the text "Guardar alterações"
+      await tester.tap(find.text('Guardar alterações'));
+      await tester.pump();
+
+      // make sure we went back to the view
+      expect(find.byType(DetalhesEdit), findsNothing);
+      expect(find.byType(DetalhesView), findsOneWidget);
+
+      // expect to see the difficulty of the evaluation
+      expect(find.text('editado'), findsOneWidget);
     });
   });
 }

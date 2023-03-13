@@ -6,7 +6,14 @@ Este projeto foi realizado por Rodrigo Francisco Félix Barata, aluno 22004275.
 
 
 # 🖼️ Screenshots
-![Dashboard](https://i.postimg.cc/yNgGDGfT/Screenshot-20230309-153456.png) ![Listagem de avaliações](https://i.postimg.cc/QdnPxDqt/Screenshot-20230309-153518.png) ![Registo de avaliação](https://i.postimg.cc/MpGNSHVN/Screenshot-20230309-153533.png) ![Detalhes da avaliação](https://i.postimg.cc/wT2ZZLyD/Screenshot-20230309-153550.png) ![Edição de avaliação](https://i.postimg.cc/dtwg541q/Screenshot-20230309-153601.png) ![Dealer](https://i.postimg.cc/kMxkNk71/Screenshot-20230309-153623.png)
+<div class = "row">
+<img src="https://i.postimg.cc/yNgGDGfT/Screenshot-20230309-153456.png" style="width:33%" alt="Dashboard" title="Dashboard">
+<img src="https://i.postimg.cc/QdnPxDqt/Screenshot-20230309-153518.png" style="width:33%" alt="Listagem de avaliações" title="Listagem de avaliações">
+<img src="https://i.postimg.cc/MpGNSHVN/Screenshot-20230309-153533.png" style="width:33%" alt="Registo de avaliação" title="Registo de avaliação">
+<img src="https://i.postimg.cc/wT2ZZLyD/Screenshot-20230309-153550.png" style="width:33%" alt="Detalhes da avaliação" title="Detalhes da avaliação">
+<img src="https://i.postimg.cc/dtwg541q/Screenshot-20230309-153601.png" style="width:33%" alt="Edição de avaliação" title="Edição de avaliação">
+<img src="https://i.postimg.cc/kMxkNk71/Screenshot-20230309-153623.png" style="width:33%" alt="Dealer" title="Dealer">
+</div>
 
 # 🔬 Funcionalidades
 Introdução das funcionalidades implementadas
